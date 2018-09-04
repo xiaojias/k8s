@@ -1,0 +1,211 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml-stylesheet href='note-html.xsl' type='text/xsl'?>
+<note xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy" version="0.3"><title>K8s installation in one ECS server of Aliyun(V1.11.2)</title><text xml:space="preserve"><note-content version="0.1">K8s installation in one ECS server of Aliyun(V1.11.2)
+
+<bold><size:large>K8s Installation</size:large></bold>
+
+Install on single one server, and it acts as Master and Worker node as well.
+
+<bold>Environment</bold>
+OS: CentOS Linux release 7.4 (Core)
+
+Kubernetes: v1.11.2
+
+<bold>Preparation</bold>
+1. Add entries into <link:url>/etc/hosts</link:url> for master and every worker node, the entry likes:
+&lt;<link:internal>private</link:internal> ip&gt;  test01
+
+2. Stop and Disable firewalld service
+# systemctl stop firewalld &amp;&amp; systemctl disable firewalld
+
+3. Disable SELinux 
+#setenforce 0
+#vi <link:url>/etc/selinux/config</link:url>
+
+4. Disable swap
+#echo "vm.swappiness = 0"&gt;&gt; <link:url>/etc/sysctl.conf</link:url> 
+
+<bold>Check ali YUM source for K8s and configure if necessary</bold>
+# cat <link:url>/etc/yum.repos.d/kubernetes.repo</link:url>
+[kubernetes]
+name=Kubernetes
+baseurl=<link:url>https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</link:url>
+enabled=1
+gpgcheck=0
+
+<bold>And update repo files with the attached .repo files (repo.tar)</bold>
+
+# yum -y install epel-release
+
+# yum clean all
+
+# yum makecache
+
+<bold>Install kubeadm and tools</bold>
+
+# yum install <link:internal>docker</link:internal> kubelet kubeadm kubectl kubernetes-cni
+
+<bold>Load images if there is any blocker on network to google for image pulling</bold>
+&lt;*.tar files&gt;
+<bold>And change the tag</bold>
+
+<bold>Install Kubernetes with kubeadm</bold>
+# kubeadm init --kubernetes-version=v1.11.2 --pod-network-cidr=10.244.0.0/16
+[init] using Kubernetes version: v1.11.2
+[preflight] running pre-flight checks
+I0902 11:43:49.771080   20293 kernel_validator.go:81] Validating kernel version
+I0902 11:43:49.771205   20293 kernel_validator.go:96] Validating kernel config
+[preflight/images] Pulling images required for setting up a Kubernetes cluster
+[preflight/images] This might take a minute or two, depending on the speed of your internet connection
+[preflight/images] You can also perform this action in beforehand using 'kubeadm config images pull'
+[kubelet] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[preflight] Activating the kubelet service
+[certificates] Generated ca certificate and key.
+[certificates] Generated apiserver certificate and key.
+[certificates] apiserver serving cert is signed for DNS names [test01 kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 172.31.65.91]
+[certificates] Generated apiserver-kubelet-client certificate and key.
+[certificates] Generated sa key and public key.
+[certificates] Generated front-proxy-ca certificate and key.
+[certificates] Generated front-proxy-client certificate and key.
+[certificates] Generated etcd/ca certificate and key.
+[certificates] Generated etcd/server certificate and key.
+[certificates] etcd/server serving cert is signed for DNS names [test01 localhost] and IPs [127.0.0.1 ::1]
+[certificates] Generated etcd/peer certificate and key.
+[certificates] etcd/peer serving cert is signed for DNS names [test01 localhost] and IPs [172.31.65.91 127.0.0.1 ::1]
+[certificates] Generated etcd/healthcheck-client certificate and key.
+[certificates] Generated apiserver-etcd-client certificate and key.
+[certificates] valid certificates and keys now exist in "/etc/kubernetes/pki"
+[kubeconfig] Wrote KubeConfig file to disk: "<link:url>/etc/kubernetes/admin.conf</link:url>"
+[kubeconfig] Wrote KubeConfig file to disk: "/etc/kubernetes/kubelet.conf"
+[kubeconfig] Wrote KubeConfig file to disk: "/etc/kubernetes/controller-manager.conf"
+[kubeconfig] Wrote KubeConfig file to disk: "/etc/kubernetes/scheduler.conf"
+[controlplane] wrote Static Pod manifest for component kube-apiserver to "/etc/kubernetes/manifests/kube-apiserver.yaml"
+[controlplane] wrote Static Pod manifest for component kube-controller-manager to "/etc/kubernetes/manifests/kube-controller-manager.yaml"
+[controlplane] wrote Static Pod manifest for component kube-scheduler to "/etc/kubernetes/manifests/kube-scheduler.yaml"
+[etcd] Wrote Static Pod manifest for a local etcd instance to "/etc/kubernetes/manifests/etcd.yaml"
+[init] waiting for the kubelet to boot up the control plane as Static Pods from directory "/etc/kubernetes/manifests" 
+[init] this might take a minute or longer if the control plane images have to be pulled
+[apiclient] All control plane components are healthy after 40.002134 seconds
+[uploadconfig] storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[kubelet] Creating a ConfigMap "kubelet-config-1.11" in namespace kube-system with the configuration for the kubelets in the cluster
+[markmaster] Marking the node test01 as master by adding the label "node-role.kubernetes.io/master=''"
+[markmaster] Marking the node test01 as master by adding the taints [node-role.kubernetes.io/master:NoSchedule]
+[patchnode] Uploading the CRI Socket information "/var/run/dockershim.sock" to the Node API object "test01" as an annotation
+[bootstraptoken] using token: c8ne1o.hh60w2lrsumq2khh
+[bootstraptoken] configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+[bootstraptoken] configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+[bootstraptoken] configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+[bootstraptoken] creating the "cluster-info" ConfigMap in the "kube-public" namespace
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+Your Kubernetes master has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i <link:url>/etc/kubernetes/admin.conf</link:url> $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  <link:url>https://kubernetes.io/docs/concepts/cluster-administration/addons/</link:url>
+
+You can now join any number of machines by running the following on each node
+as root:
+
+<highlight>  kubeadm join 172.31.65.91:6443 --token c8ne1o.hh60w2lrsumq2khh --discovery-token-ca-cert-hash sha256:e3d8b356c8457dff16b5a39a6c358493f8734fed54fa22380b58bbc4f355de34</highlight>
+
+<bold>Configure kubectl</bold>
+
+# mkdir -p $HOME/.kube
+# sudo cp -i <link:url>/etc/kubernetes/admin.conf</link:url> $HOME/.kube/config
+# sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+<bold>Install and configure flannel network</bold>
+
+# mkdir -p <link:url>/etc/cni/net.d/</link:url>
+
+# cat <link:url>/etc/cni/net.d/10-flannel.conf</link:url> 
+{
+“name”: “cbr0”,
+“type”: “flannel”,
+“delegate”: {
+“isDefaultGateway”: true
+}
+}
+
+# mkdir <link:url>/run/flannel</link:url>
+
+# cat <link:url>/run/flannel/subnet.env</link:url> 
+FLANNEL_NETWORK=10.244.0.0/16
+FLANNEL_SUBNET=10.244.1.0/24
+FLANNEL_MTU=1450
+FLANNEL_IPMASQ=true
+
+# wget <link:url>https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml</link:url>
+# kubectl apply -f kube-flannel.yml
+
+<bold>Verify the installation</bold>
+# kubectl get nodes --all-namespaces
+NAME      STATUS    ROLES     AGE       VERSION
+test01    Ready     master    20m       v1.11.2
+[root@test01 config]# kubectl get pods --all-namespaces
+NAMESPACE     NAME                             READY     STATUS    RESTARTS   AGE
+kube-system   coredns-78fcdf6894-5bctd         1/1       Running   0          20m
+kube-system   coredns-78fcdf6894-fc7bd         1/1       Running   0          20m
+kube-system   etcd-test01                      1/1       Running   0          19m
+kube-system   kube-apiserver-test01            1/1       Running   0          19m
+kube-system   kube-controller-manager-test01   1/1       Running   0          19m
+kube-system   kube-flannel-ds-lqvwr            1/1       Running   0          55s
+kube-system   kube-proxy-7b5bm                 1/1       Running   0          20m
+kube-system   kube-scheduler-test01            1/1       Running   0          19m
+
+<bold>Dashboard installation</bold>
+<bold>Option 1 without authentication</bold>
+
+# kubectl apply -f kubernetes-dashboard-http.yaml
+# kubectl apply -f admin-role.yaml
+# kubectl apply -f kubernetes-dashboard-admin.rbac.yaml
+
+Checking with <link:internal>private</link:internal> IP:
+# curl <link:url>http://&lt;private-ip&gt;:31000</link:url>
+
+Configure in 云服务器 ECS --&gt; 安全组列表 to enable the income through port of 31000 for public IP
+
+Login with:
+<link:url>http://&lt;public-IP&gt;:31000</link:url>
+
+
+<bold>Option 2 with token authentication:</bold>
+
+# kubectl apply -f <link:url>/opt/config/dashboard2/dashboard.yaml</link:url>
+
+Get token by:
+# kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+
+Config 云服务器 ECS --&gt; 安全组列表 enable the income through port of 30000 ports for public IP
+
+Login <link:url>https://&lt;public-IP&gt;:30000/#!/login</link:url> with providing token
+
+<bold><size:large>Additional information:</size:large></bold>
+<bold><size:large>API</size:large></bold>
+
+Config 云服务器 ECS --&gt; 安全组列表 to open 6443 port for public IP
+
+<link:url>https://&lt;public-ip&gt;:6443/api/v1</link:url>
+
+
+<bold>The used images are exported with following commands:</bold> 
+with command:
+# for i in `<link:internal>docker</link:internal> images | grep -v "REPOSITORY" | awk -F" " '{ print $1":"$2 }'`
+do 
+    file=`echo $i | sed 's/\//@/g' `
+    <link:internal>docker</link:internal> save -o ${file}.tar $i
+done
+
+and they can be loaded with "<link:internal>docker</link:internal> load " command.
+
+</note-content>
+</text><last-change-date>2018-09-03T12:32:54.034912Z</last-change-date><last-metadata-change-date>2018-09-03T12:32:54.035958Z</last-metadata-change-date><create-date>2018-09-02T01:02:13.118259Z</create-date><cursor-position>72</cursor-position><selection-bound-position>-1</selection-bound-position><width>1069</width><height>626</height><tags><tag>system:notebook:aliyun</tag></tags></note>
