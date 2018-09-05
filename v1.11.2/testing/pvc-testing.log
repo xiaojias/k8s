@@ -1,0 +1,15 @@
+
+[root@test01 ~]# kubectl -n testing exec --pod="mypod" date
+-p POD_NAME is DEPRECATED and will be removed in a future version. Use exec POD_NAME instead.
+Wed Sep  5 13:00:02 UTC 2018
+
+[root@test01 ~]# ls -lrt /mypod-data
+total 0
+[root@test01 ~]# touch /mypod-data/test.list
+[root@test01 ~]# ls -lrt /mypod-data
+total 0
+-rw-r--r-- 1 root root 0 Sep  5 21:01 test.list
+
+[root@test01 ~]# kubectl -n testing exec --pod="mypod" ls /var/data
+-p POD_NAME is DEPRECATED and will be removed in a future version. Use exec POD_NAME instead.
+test.list
