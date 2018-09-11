@@ -36,7 +36,7 @@ Kubernetes Cluster Installation
 ```# kubeadm init --config kube-config.01```
 
 5. On Master node, Configuring kubelet to use cluster with root, by performing command:   
-```cp -i /etc/kubernetes/admin.conf $HOME/.kube/config```   
+```#cp -i /etc/kubernetes/admin.conf $HOME/.kube/config```   
 6. On Master node, Deploying flannel to the cluster   
 Creating configuration files like following:   
 ```# mkdir -p /etc/cni/net.d/```   
