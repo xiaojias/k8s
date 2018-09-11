@@ -1,4 +1,4 @@
-Steps to deploy Kubernetes v1.11.2 via [kubeadmin](https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/) method
+Steps to deploy Kubernetes [v1.11.2](https://github.com/kubernetes/kubernetes/releases/tag/v1.11.2) via [kubeadmin](https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/) method
 ===
 
 Environment
