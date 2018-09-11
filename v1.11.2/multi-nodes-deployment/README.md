@@ -11,7 +11,7 @@ CentOS 7
 Preparation
 ---
 1. Update /etc/hosts for every node  
-2. Set YUM source for Kubernetes
+2. Set YUM source for Kubernetes   
 ```# cat /etc/yum.repos.d/kubernetes.repo```   
 ```[kubernetes]```   
 ```name=Kubernetes```   
