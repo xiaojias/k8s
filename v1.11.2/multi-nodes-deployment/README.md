@@ -91,3 +91,13 @@ For Dashboard
 ```# kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | grep "^token" | sed 's/^.* //g'```
 2. Login https://aliyun-test01:30000 with captured token value as ![Dashboard UI](https://github.com/xiaojias/k8s/blob/master/v1.11.2/dashboard-01.png)   
 
+Prometheus installation
+---
+1. Create namespace   
+```# kubectl create namespace monitoring```   
+2. Remove tain for master node   
+```# kubectl taint node test01 node-role.kubernetes.io/master:NoSchedule-```   
+3. Install Prometheus operator from [YAMLs](https://github.com/xiaojias/k8s/tree/master/v1.11.2/multi-nodes-deployment/prometheus-operator)   
+4. Install Prometheus from [YAMs](https://github.com/xiaojias/k8s/tree/master/v1.11.2/multi-nodes-deployment/prometheus)
+5. Open link of https://aliyun-test01:30900 likes as ![Prometheus](https://github.com/xiaojias/k8s/blob/master/v1.11.2/prometheus-01.png)   
+
