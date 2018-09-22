@@ -1,0 +1,58 @@
+---
+# pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+  namespace: testing
+spec:
+  containers:
+    - name: mycontainer
+      image: nginx
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/var/data"
+          name: data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: myclaim
+        readOnly: true
+
+---
+# pv
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mypv
+  namespace: testing
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  #nfs:
+  #  path: /home/nfs
+  #  server: k8s-master
+  hostPath:
+    path: "/mypod-data"
+
+---
+# pvc
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+  namespace: testing
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""
+
