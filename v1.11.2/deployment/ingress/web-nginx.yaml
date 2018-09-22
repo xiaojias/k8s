@@ -1,0 +1,144 @@
+---
+# service
+#
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: web-nginx
+  name: web-nginx-x
+  namespace: ingress-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: web-nginx
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: web-nginx
+  name: web-nginx-y
+  namespace: ingress-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: web-nginx
+  type: NodePort
+
+---
+# deployment
+#
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: web-nginx
+  name: web-nginx
+  namespace: ingress-nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: web-nginx
+  template:
+    metadata:
+      labels:
+        run: web-nginx
+    spec:
+      volumes:
+      - name: www-data
+        persistentVolumeClaim:
+          claimName: claim-data
+      - name: www-conf
+        persistentVolumeClaim:
+          claimName: claim-conf
+      containers:
+      - image: nginx
+        imagePullPolicy: IfNotPresent
+        name: web-nginx
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: www-data
+        - mountPath: "/etc/nginx/conf.d"
+          name: www-conf
+      restartPolicy: Always
+
+---
+# Persistent Volume for data of: /usr/share/nginx/html
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-data
+  namespace: ingress-nginx
+  labels:
+    type: data
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/ingress/www-data"
+
+---
+# Persistent Volume for configuration of: /etc/nginx/conf.d
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-conf
+  namespace: ingress-nginx
+  labels:
+    type: conf
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/ingress/www-conf"
+
+---
+# Persistent Volume Claim for data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-data
+  namespace: ingress-nginx
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      type: "data"
+
+---
+# Persistent Volume Claim for conf
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-conf
+  namespace: ingress-nginx
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      type: "conf"
+
+---
