@@ -49,12 +49,12 @@ Verify with curl command
 
 * Checking /api/v1 with secure mode (will get resources returned)
 ~~~
-# curl  --cacert /etc/kubernetes/pki/for-heapster/ca.pem https://172.17.137.153:6443/api/v1
+# curl  --cacert /etc/kubernetes/pki/for-heapster/ca.pem https://<api server>:6443/api/v1
 ~~~
 
 * Checking others (e.g /api/v1/nodes), will get "forbidden" return
 ~~~
-# curl  --cacert /etc/kubernetes/pki/for-heapster/ca.pem https://172.17.137.153:6443/api/v1/nodes
+# curl  --cacert /etc/kubernetes/pki/for-heapster/ca.pem https://<api server>:6443/api/v1/nodes
 {
   "kind": "Status",
   "apiVersion": "v1",
