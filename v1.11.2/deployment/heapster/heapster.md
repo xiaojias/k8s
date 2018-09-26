@@ -41,6 +41,23 @@ Heapster installation (InfluxDB + Grafana based on K8s v1.11.2)
 ~~~
 
 4. Verification;
+* Checking the roles ('create' should be there)
+~~~
+# kubectl -n kube-system describe clusterrole system:heapster
+Name:         system:heapster
+Labels:       kubernetes.io/bootstrapping=rbac-defaults
+Annotations:  kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRole","metadata":{"annotations":{},"labels":{"kubernetes.io/bootstrapping":"rbac-defaults"}...
+              rbac.authorization.kubernetes.io/autoupdate=true
+PolicyRule:
+  Resources               Non-Resource URLs  Resource Names  Verbs
+  ---------               -----------------  --------------  -----
+  events                  []                 []              [create get list watch]
+  namespaces              []                 []              [create get list watch]
+  nodes                   []                 []              [create get list watch]
+  pods                    []                 []              [create get list watch]
+  deployments.extensions  []                 []              [get list watch]
+
+~~~
 * Checking the pods' status
 ~~~
 # kubectl get pod  -n kube-system
