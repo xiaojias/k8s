@@ -107,5 +107,5 @@ monitoring-influxdb-848b9b66f6-4ld6t    0m           94Mi
 
 ~~~
 * Checking the output on K8s dashboard   
-it looks like ![K8s Dashboard with Heapster installed](https://github.com/xiaojias/k8s/tree/master/v1.11.2/deployment/heapster/k8s-heapster.png)   
+it looks like: ![K8s Dashboard with Heapster installed](https://github.com/xiaojias/k8s/blob/master/v1.11.2/deployment/heapster/k8s-heapster.png)   
 
