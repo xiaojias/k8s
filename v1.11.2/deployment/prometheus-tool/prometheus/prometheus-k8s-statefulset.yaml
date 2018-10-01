@@ -1,0 +1,86 @@
+#kind: Secret
+#apiVersion: v1
+#data:
+#  key: QVFCZU54dFlkMVNvRUJBQUlMTUVXMldSS29mdWhlamNKaC8yRXc9PQ==
+#metadata:
+#  name: ceph-secret
+#  namespace: monitoring
+#type: kubernetes.io/rbd
+
+---
+#kind: StorageClass
+#apiVersion: storage.k8s.io/v1
+#metadata:
+#  name: prometheus-ceph-fast
+#  namespace: monitoring
+#provisioner: ceph.com/rbd
+#parameters:
+#  monitors: 10.18.19.91:6789
+#  adminId: admin
+#  adminSecretName: ceph-secret
+#  adminSecretNamespace: monitoring
+#  userSecretName: ceph-secret
+#  pool: prometheus-dev
+#  userId: admin
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: k8s
+  namespace: monitoring
+  labels:
+    prometheus: k8s
+spec:
+  replicas: 1
+  version: v2.0.0
+  serviceAccountName: prometheus-k8s
+  serviceMonitorSelector:
+    matchExpressions:
+    - {key: k8s-app, operator: Exists}
+  nodeSelector:
+    role: master
+  ruleSelector:
+    matchLabels:
+      role: prometheus-rulefiles
+      prometheus: k8s
+  resources:
+    requests:
+      memory: 1G
+  storage:
+#    volumeClaimTemplate:
+#      metadata:
+#        name: prometheus-data
+#        annotations:
+#          volume.beta.kubernetes.io/storage-class: prometheus-ceph-fast
+#      spec:
+#        accessModes: [ "ReadWriteOnce" ]
+#        resources:
+#          requests:
+#            storage: 50Gi
+    volumeClaimTemplate:
+      spec:
+        selector:
+          matchLabels:
+            type: prometheus-data
+        resources:
+          requests:
+            storage: 2Gi
+  alerting:
+    alertmanagers:
+    - namespace: monitoring
+      name: alertmanager-main
+      port: web
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-data
+  labels:
+    type: prometheus-data
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteOnce # required
+  hostPath:
+    path: "/prometheus-data"
