@@ -107,3 +107,70 @@ Prometheus installation
 5. Open link of https://aliyun-test01:30900 likes as:   
 ![Prometheus](https://github.com/xiaojias/k8s/blob/master/v1.11.2/prometheus-01.png)   
 
+Prometheus Exporters installation
+---
+1. Node exporter
+~~~
+# tree node-exporter/
+node-exporter/
+├── node-exporter-daemonset.yaml
+├── node-exporter-service.yaml
+└── prometheus-k8s-service-monitor-node-exporter.yaml
+~~~
+
+2. kube-state metrics
+~~~
+# tree kube-state-metrics/
+kube-state-metrics/
+├── kube-state-metrics-cluster-role-binding.yaml
+├── kube-state-metrics-cluster-role.yaml
+├── kube-state-metrics-deployment.yaml
+├── kube-state-metrics-role-binding.yaml
+├── kube-state-metrics-role.yaml
+├── kube-state-metrics-service-account.yaml
+├── kube-state-metrics-service.yaml
+└── prometheus-k8s-service-monitor-kube-state-metrics.yaml
+~~~
+
+3. kubernetes key components
+~~~
+# tree kube-components/
+kube-components/
+├── exporter-kube-apiserver
+│   └── prometheus-k8s-service-monitor-apiserver.yaml
+├── exporter-kube-controller-manager
+│   ├── kube-controller-manager-svc.yaml
+│   └── prometheus-k8s-service-monitor-kube-controller-manager.yaml
+├── exporter-kube-dns
+│   ├── kube-dns.yaml
+│   └── prometheus-k8s-service-monitor-kube-dns.yaml
+├── exporter-kubelets
+│   └── prometheus-k8s-service-monitor-kubelet.yaml
+├── exporter-kube-router
+│   ├── kube-router-svc.yaml
+│   └── prometheus-k8s-service-monitor-kube-scheduler.yaml
+└── exporter-kube-scheduler
+    ├── kube-scheduler-svc.yaml
+    └── prometheus-k8s-service-monitor-kube-scheduler.yaml
+~~~
+
+4. alert manager
+~~~
+# tree alertmanager/
+alertmanager/
+├── alertmanager.conf
+├── alertmanager.conf.base64
+├── alertmanager-config.sh
+├── alertmanager-config.yaml
+├── alertmanager-service.yaml
+├── alertmanager-templates-default.conf
+├── alertmanager-templates-slack.conf
+├── alertmanager.yaml
+├── default.base64
+└── prometheus-k8s-service-monitor-alertmanager.yaml
+~~~
+
+After installed above YAML files, the targets are as following:   
+![Prometheus](https://github.com/xiaojias/k8s/blob/master/v1.11.2/prometheus-02.png)   
+
+(TBD: Some targets are shown as DOWN, since their configuration required to be adjusted on ip address)
