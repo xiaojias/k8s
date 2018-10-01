@@ -97,8 +97,11 @@ Prometheus installation
 ---
 1. Create namespace   
 ```# kubectl create namespace monitoring```   
-2. Remove tain for master node   
-```# kubectl taint node test01 node-role.kubernetes.io/master:NoSchedule-```   
+2. Remove tain for master node and set role for master  
+```
+# kubectl taint node test01 node-role.kubernetes.io/master:NoSchedule-   
+# kubectl label nodes test01 role=master
+```   
 3. Install Prometheus operator from [YAMLs](https://github.com/xiaojias/k8s/tree/master/v1.11.2/multi-nodes-deployment/prometheus-operator)   
 4. Install Prometheus from [YAMs](https://github.com/xiaojias/k8s/tree/master/v1.11.2/multi-nodes-deployment/prometheus)
 5. Open link of https://aliyun-test01:30900 likes as:   
