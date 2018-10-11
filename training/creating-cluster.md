@@ -1,6 +1,6 @@
-#Creating a single master cluster from kubeadm
+# Creating a single master cluster from kubeadm
 
-##Environment
+## Environment
 
 The host should be able to pull images from gcr.io. If you have any issues on blocking to pull them, you can:   
  1. Get the required images list
@@ -23,7 +23,7 @@ k8s.gcr.io/coredns:1.2.2
 ~~~
 For details, you can refer scripts:[*-images.sh](https://github.com/xiaojias/k8s/tree/master/v1.11.2)
 
-##Environment preparing
+## Environment preparing
 
 1. Disable swap for kubelet by modifying the file's content
 ~~~
@@ -40,7 +40,7 @@ vm.swappiness = 0
 ~~~
 Using command "ip link delete <name>" to remove unnecesary interface, e.g docker0, flannel.1 etc.
 
-##Installing kubeadm
+## Installing kubeadm
 1. Updating system with root user
 ~~~
 # yum update && yum upgrade -y
@@ -137,7 +137,7 @@ kubernetes-cni-0.6.0-0.x86_64
 kubectl-1.12.1-0.x86_64
 ~~~
    
-4. Initializing the master
+## Initializing the master
 ~~~
 # kubeadm init --pod-network-cidr=10.244.0.0/16
 [init] using Kubernetes version: v1.12.1
@@ -211,7 +211,7 @@ Creating config for kubelet by following the stpes in above output
 # sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ~~~
 
-Verifying the initializing
+Verifying the initialization
 ~~~
 $ kubectl get nodes
 NAME     STATUS     ROLES    AGE    VERSION
@@ -249,7 +249,7 @@ daemonset.extensions/kube-flannel-ds-s390x created
 
 ~~~
 
-Verifying the initializing
+## Verifying the installation
 ~~~
 # kubectl -n kube-system get pods
 NAME                             READY   STATUS    RESTARTS   AGE
@@ -263,7 +263,8 @@ kube-proxy-tlhp7                 1/1     Running   0          57m
 kube-scheduler-test01            1/1     Running   0          56m
 
 ~~~
-5. Removing taints
+## Post actions
+### Removing taints
 ~~~
 # kubectl describe node test01 | grep -i taint
 Taints:             node-role.kubernetes.io/master:NoSchedule
