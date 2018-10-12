@@ -19,5 +19,5 @@ Transfer the p12 file to local and import to firefox
 through "Preference" --> "Advanced" --> "Certificates" --> "View ..." --> "Import" )
 ~~~    
 
-Select the imported certificates while prompting, the output looks like [RESTful01.png](https://github.com/xiaojias/k8s/blob/master/training/RESTful01.png)
+Select the imported certificates while prompting, the output looks like [RESTful01.png](https://github.com/xiaojias/k8s/blob/master/training/RESTful01.png)   
 And RESTClient will work as well ( POST action is not working so far, to be verified.)
