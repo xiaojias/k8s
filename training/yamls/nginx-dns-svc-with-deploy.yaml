@@ -1,0 +1,50 @@
+# Normal service with hostname and subdomain in container
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  name: nginx-svc
+  labels:
+    app: dns-testing
+spec:
+  ports:
+  - port: 80
+    name: http
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: nginx-svc
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: nginx-svc
+    app: dns-testing
+  name: nginx-svc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx-svc
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: nginx-svc
+        app: dns-testing
+    spec:
+      hostname: nginx
+      subdomain: nginx-svc
+      containers:
+      - image: nginx
+        imagePullPolicy: IfNotPresent
+        name: nginx-svc
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
