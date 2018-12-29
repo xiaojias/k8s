@@ -111,6 +111,8 @@ Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
 Name:      10-244-0-113.default.pod
 Address 1: 10.244.0.113 nginx.nginx-svc.default.svc.cluster.local
 ~~~
+## Tips:
+- Pod has NOT SRV record in deployment, if your application has a logical connection ( need to commnect to a specific Pod name), then you need to come up to [StatefulSet](https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#creating-a-statefulset)
 
 End of Doc
 ---
