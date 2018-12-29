@@ -14,7 +14,7 @@ Server Version: version.Info{Major:"1", Minor:"12", GitVersion:"v1.12.1", GitCom
 - Set pod.spec.subdomain as same as the service name; 
 - Set service.ports.name;
 
-## Miscellaneous
+## Scenarios
 ### For General Service
 The Pods are created, and with hostname and subdomain set. ( The subdomain must equal to service name, otherwise, the pods'ip can not be resolved for my-hostname.my-subdomain.my-namespace.svc.cluster.local). refers to YAML file file of [nginx-dns-svc-with-deploy.yaml](https://github.com/xiaojias/k8s/tree/master/training/yamls/nginx-dns-svc-with-deploy.yaml).
 
