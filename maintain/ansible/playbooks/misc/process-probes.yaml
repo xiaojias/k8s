@@ -1,0 +1,32 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+  - name: Check if NCO service is running
+    shell: systemctl status nco
+    register: nco_systemctl_output
+    changed_when: false
+    #ignore_errors: true
+
+  - name: Check  EIF_PROBE processes are running
+    shell: ps aux | grep nco_p_tivoli_eif | grep -v grep
+    changed_when: false
+    register: nco_eif_status
+
+  - name: Check PING PROBE processes are running
+    shell: ps aux | grep nco_p_ping | grep -v grep
+    changed_when: false
+    register: nco_ping_status
+
+
+  - name: Check SNMP PROBE processes are running
+    shell: ps aux | grep nco_p_mttrapd | grep -v grep
+    changed_when: false
+    register: nco_mtrapd_status
+
+
+  - name: Check MSGBUS PROBE processes are running
+    shell: ps aux | grep nco_p_message_bus | grep -v grep
+    changed_when: false
+    register: nco_msgbus_status
+

@@ -1,0 +1,12 @@
+---
+- hosts: pdr
+  gather_facts: false
+  tasks:
+  - name: "<TASK>UCD Relay connectivity test <SOURCE>PDR UCD-RELAY <TARGET> TAAS-UCD-SERVER (internet)  <PORTS>443, 7918"
+    wait_for: host="{{ hosts.taas_ucd_server }}" port="{{ item }}" timeout=5
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ ports.ucd_server.https }}"
+      - "{{ ports.ucd_server.jms }}"
+...

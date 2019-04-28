@@ -1,0 +1,13 @@
+---
+- hosts: ams_sres_shared_autobuild
+  gather_facts: false
+  tasks:
+  - name: Connectivity test from AMS-SHARED-UCDRELAY to TaaS UCD Server
+    #when: "'autobuild' in inventory_hostname"
+    wait_for: host="{{ hosts.taas_ucd_server }}" port="{{ item }}" timeout=5
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ ports.ucd_server.https }}"
+      - "{{ ports.ucd_server.jms }}"
+...

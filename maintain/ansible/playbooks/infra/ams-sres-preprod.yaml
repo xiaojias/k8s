@@ -1,0 +1,111 @@
+---
+# ------------------------------------------------------------------------------------------
+# Name:         ams-sres-preprod infrastructure connectivity test
+# Description:  Document and test all required connections to ams-preprod environment
+# Inventory:    inventory/region
+# Author:       Felipe Silveira (fsilveir@br.ibm.com)
+# Last Update:  Mar/02/2019
+# ------------------------------------------------------------------------------------------
+# task_01: <TASK> SAMBA connectivity test <SOURCE>ALL AMS_SRES_PREPROD VMs <DESTINATION> AMS_SRES_SHARED_AUTOBUILD <PORT> 445, 139
+# task_02: <TASK> SSH connectivity test <SOURCE>AMS_SRES_SHARED_AUTOBUILD <DESTINATION>ALL AMS_SRES_PREPROD VMs <PORT> 22
+# task_03: <TASK> ICMP Ping connectivity test <SOURCE> AMS_SRES_SHARED Netcool Ping Probes <DESTINATION> ALL AMS_SRES_PREPROD VMs <PORT> ICMP
+# task_04: <TASK> SSH connectivity test <SOURCE> ALL AMS_SRES_PREPROD VMs <TARGET> ALL AMS_SRES_PREPROD VMs <PORT> 22
+# task_05: <TASK>UCD Relay connectivity test <SOURCE>ALL AMS_SRES_PREPROD <TARGET>AMS_SRES_SHARED_AUTOBUILD(UCD_RELAY) <PORTS>7916, 20080, 20081
+# task_06: <TASK>Blue Integrate-APIe (IPcenter-DEV) connectivity test <SOURCE> AMS_SRES_PREPROD Impact servers <TARGET>AMS_DEV_BLUEAPIs <PORT>443
+# task_07: <TASK>IPM Agent connectivity test <SOURCE>ALL AMS_SRES_PREPROD VMs <TARGET> IPM SAAS Gateways <PORT>443
+# ------------------------------------------------------------------------------------------
+#
+- hosts: all
+  gather_facts: false
+  tasks:
+# ------------------------------------------------------------------------------------------
+  - name: "<TASK> SAMBA connectivity test <SOURCE>ALL AMS_SRES_PREPROD VMs <DESTINATION> AMS_SRES_SHARED_AUTOBUILD <PORT> 445, 139"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    wait_for: host="{{ hostvars['ams_sres_shared_autobuild'].ansible_host }}" port="{{ item }}" timeout=10
+    #register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ ports.samba.nbt }}"
+      - "{{ ports.samba.smb }}"
+# ------------------------------------------------------------------------------------------
+  - name: "<TASK> SSH connectivity test <SOURCE>AMS_SRES_SHARED_AUTOBUILD <DESTINATION>ALL AMS_SRES_PREPROD VMs <PORT> 22"
+    when: "'ams_sres_shared_autobuild' in inventory_hostname"
+    wait_for: host="{{ item }}" port="{{ ports.ssh }}" timeout=10
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hostvars['ams_sres_preprod_netcool_probes'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_webgui'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_secondary'].ansible_host }}"
+# ------------------------------------------------------------------------------------------
+  - name: "<TASK> ICMP Ping connectivity test <SOURCE> AMS_SRES_SHARED Netcool Ping Probes <DESTINATION> ALL AMS_SRES_PREPROD VMs <PORT> ICMP"
+    when: "'ams_sres_shared_netcool_probes' in inventory_hostname" 
+    shell: ping -c2 "{{ item }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hostvars['ams_sres_preprod_netcool_probes'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_webgui'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_secondary'].ansible_host }}"
+# ------------------------------------------------------------------------------------------
+  - name: "<TASK> SSH connectivity test <SOURCE> ALL AMS_SRES_PREPROD VMs <TARGET> ALL AMS_SRES_PREPROD VMs <PORT> 22"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    wait_for: host="{{ item }}" port="{{ ports.ssh }}" timeout=10
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hostvars['ams_sres_preprod_netcool_probes'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_webgui'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_secondary'].ansible_host }}"
+# ------------------------------------------------------------------------------------------
+  - name: "<TASK>UCD Relay connectivity test <SOURCE>ALL AMS_SRES_PREPROD <TARGET>AMS_SRES_SHARED_AUTOBUILD(UCD_RELAY) <PORTS>7916, 20080, 20081"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    wait_for: host="{{ hostvars['ams_sres_shared_autobuild'].ansible_host }}" port="{{ item }}" timeout=10
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ ports.ucd_relay.http_1 }}"
+      - "{{ ports.ucd_relay.http_2 }}"
+      - "{{ ports.ucd_relay.jms }}"
+# ------------------------------------------------------------------------------------------
+  - name: "<TASK>Blue Integrate-APIe (IPcenter-DEV) connectivity test <SOURCE> AMS_SRES_PREPROD Impact servers <TARGET>AMS_DEV_BLUEAPIs <PORT>443"
+    when: "'ams_sres_preprod_netcool_impact_' in inventory_hostname"
+    wait_for: host="{{ item }}" port="{{ ports.https }}" timeout=10
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hosts.ams_dev_blue_integrate_apie_pri }}"
+      - "{{ hosts.ams_dev_blue_integrate_apie_sec }}"
+# ------------------------------------------------------------------------------------------
+  - name: "<TASK>IPM Agent connectivity test <SOURCE>ALL AMS_SRES_PREPROD VMs <TARGET> IPM SAAS Gateways <PORT>443"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    shell: curl -v -k -v -x "{{ hosts.ams_ispw_http_proxy }}" "{{ ipm_saas.sdad.url }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hostvars['ams_sres_preprod_netcool_probes'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_omnibus_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_impact_secondary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_webgui'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_primary'].ansible_host }}"
+      - "{{ hostvars['ams_sres_preprod_netcool_lds_secondary'].ansible_host }}"
+# ------------------------------------------------------------------------------------------
+...
+

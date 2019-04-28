@@ -1,0 +1,121 @@
+---
+# ------------------------------------------------------------------------------------------
+# Name:		ams-sres-preprod infrastructure connectivity test
+# Description:  Document and test all required connections to ams-preprod environment
+# Inventory:	inventory/region
+# Author: 	Felipe Silveira (fsilveir@br.ibm.com)
+# Last Update:	Feb/15/2019
+# ------------------------------------------------------------------------------------------
+- hosts: ams_sres_preprod,ams_sres_shared_autobuild,ams_sres_shared_netcool_probes
+  gather_facts: false
+  vars:
+    task_01: <TASK> SAMBA connectivity test <SOURCE>ALL AMS_SRES_PREPROD VMs <DESTINATION> AMS_SRES_SHARED_AUTOBUILD <PORT> 445, 139
+    task_02: <TASK> SSH connectivity test <SOURCE>AMS_SRES_SHARED_AUTOBUILD <DESTINATION>ALL AMS_SRES_PREPROD VMs <PORT> 22
+    task_03: <TASK> ICMP Ping connectivity test <SOURCE> AMS_SRES_SHARED Netcool Ping Probes <DESTINATION> ALL AMS_SRES_PREPROD VMs <PORT> ICMP
+    task_04: <TASK> SSH connectivity test <SOURCE> ALL AMS_SRES_PREPROD VMs <TARGET> ALL AMS_SRES_PREPROD VMs <PORT> 22
+    task_05: <TASK>UCD Relay connectivity test <SOURCE>ALL AMS_SRES_PREPROD <TARGET>AMS_SRES_SHARED_AUTOBUILD(UCD_RELAY) <PORTS>7916, 20080, 20081
+    task_06: <TASK>Blue Integrate-APIe (IPcenter-DEV) connectivity test <SOURCE> AMS_SRES_PREPROD Impact servers <TARGET>AMS_DEV_BLUEAPIs <PORT>443
+#   task_06: <TASK>Blue Integrate-APIe (IPcenter-PROD) connectivity test <SOURCE> AMS_SRES_PREPROD Impact servers <TARGET>AMS_PROD_BLUEAPIs <PORT>443
+    task_07: <TASK>IPM Agent connectivity test <SOURCE>ALL AMS_SRES_PREPROD VMs <TARGET> IPM SAAS Gateways <PORT>443
+
+
+  tasks:
+# ------------------------------------------------------------------------------------------
+  - name: "{{ task_01 }}"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    wait_for: host="{{ hosts.ams_sres_shared_autobuild }}" port="{{ item }}"
+    #register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ ports.samba.nbt }}"
+      - "{{ ports.samba.smb }}"
+# ------------------------------------------------------------------------------------------
+  - name: "{{ task_02 }}"
+    when: "'ams_sres_shared_autobuild' in inventory_hostname"
+    wait_for: host="{{ item }}" port="{{ ports.ssh }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hosts.ams_sres_preprod_netcool_probes }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_webgui }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_secondary }}"
+# ------------------------------------------------------------------------------------------
+  - name: "{{ task_03 }}"
+    when: "'ams_sres_shared_netcool_probes' in inventory_hostname" 
+    shell: ping -c2 "{{ item }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hosts.ams_sres_preprod_netcool_probes }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_webgui }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_secondary }}"
+# ------------------------------------------------------------------------------------------
+  - name: "{{ task_04 }}"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    wait_for: host="{{ item }}" port="{{ ports.ssh }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hosts.ams_sres_preprod_netcool_probes }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_webgui }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_secondary }}"
+# ------------------------------------------------------------------------------------------
+  - name: "{{ task_05 }}"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    wait_for: host="{{ hosts.ams_sres_shared_autobuild }}" port="{{ item }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ ports.ucd_relay.http_1 }}"
+      - "{{ ports.ucd_relay.http_2 }}"
+      - "{{ ports.ucd_relay.jms }}"
+# ------------------------------------------------------------------------------------------
+  - name: "{{ task_06 }}"
+    when: "'ams_sres_preprod_netcool_impact_' in inventory_hostname"
+    wait_for: host="{{ item }}" port="{{ ports.https }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hosts.ams_dev_blue_integrate_apie_pri }}"
+      - "{{ hosts.ams_dev_blue_integrate_apie_sec }}"
+# ------------------------------------------------------------------------------------------
+#  - name: <TASK>Blue Integrate-APIe (IPcenter-PROD) connectivity test <SOURCE> AMS_SRES_PREPROD Impact servers <TARGET>AMS_PROD_BLUEAPIs <PORT>443
+#    when: "'ams_sres_preprod_netcool_impact_' in inventory_hostname"
+#    wait_for: host="{{ item }}" port="{{ ports.https }}"
+#    register: cmd_output
+#    changed_when: false
+#    with_items:
+#      - "{{ hosts.ams_prod_blue_integrate_apie_pri }}"
+#      - "{{ hosts.ams_prod_blue_integrate_apie_sec }}"
+# ------------------------------------------------------------------------------------------
+  - name: "{{ task_07 }}"
+    when: "'ams_sres_preprod' in inventory_hostname"
+    shell: curl -v -k -v -x "{{ hosts.ams_ispw_http_proxy }}" "{{ ipm_saas.sdad.url }}"
+    register: cmd_output
+    changed_when: false
+    with_items:
+      - "{{ hosts.ams_sres_preprod_netcool_probes }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_omnibus_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_impact_secondary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_webgui }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_primary }}"
+      - "{{ hosts.ams_sres_preprod_netcool_lds_secondary }}"
+# ------------------------------------------------------------------------------------------
+...

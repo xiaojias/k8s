@@ -1,0 +1,28 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+  - name: make directory
+    shell: "{{promote}} mkdir -p /home/{{ username }}/.ssh"
+    register: cmd_output
+    changed_when: false
+
+  - name: create temp pubkey
+    shell: "{{promote}} echo {{pubkey}} > /tmp/{{username}}_authorized_keys"
+    register: cmd_output
+    changed_when: false
+
+  - name: move pubkey to user home directory
+    shell: "{{promote}} mv /tmp/{{username}}_authorized_keys /home/{{ username}}/.ssh/authorized_keys"
+    register: cmd_output
+    changed_when: false
+
+  - name: Change ownership
+    shell: "{{promote}} chown -R {{username}}:users /home/{{ username}}/.ssh"
+    register: cmd_output
+    changed_when: false
+
+  - name: Change permission
+    shell: "{{promote}} chmod -R 700 /home/{{ username}}/.ssh"
+    register: cmd_output
+    changed_when: false

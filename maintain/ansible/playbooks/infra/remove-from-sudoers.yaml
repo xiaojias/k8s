@@ -1,0 +1,35 @@
+---
+# Remove user from sudoers without lineinfile module
+# -------------------------------------------------------------------------------------
+# INFO:  In order to use this playbook, pass the username as extra
+# arguments, as shown in the example below:
+#
+# Ex: ansible-playbook -i inventory/ams.yaml  --extra-vars='{ username : "fsilveir" }'
+# --------------------------------------------------------------------------------------
+- hosts: all
+  gather_facts: false
+  tasks:
+  - name: "Backup sudoers file"
+    shell: '{{ promote }} cp /etc/sudoers /etc/sudoers.bkp.20190304 > /tmp/sudoers.tmp'
+    register: cmd_output
+    changed_when: false
+
+  - name: "Create temp sudoers file"
+    shell: '{{ promote }} grep -v {{ username }} /etc/sudoers > /tmp/sudoers.tmp'
+    register: cmd_output
+    changed_when: false
+
+  - name: "Fix permission of temp sudoers"
+    shell: '{{ promote }} chmod 440 /tmp/sudoers.tmp'
+    register: cmd_output
+    changed_when: false
+
+  - name: "Fix ownership of temp sudoers"
+    shell: '{{ promote }} chown -R root:system /tmp/sudoers.tmp'
+    register: cmd_output
+    changed_when: false
+
+  - name: "Replace old sudoers file with new one"
+    shell: '{{ promote }} mv /tmp/sudoers.tmp /etc/sudoers'
+    register: cmd_output
+    changed_when: false

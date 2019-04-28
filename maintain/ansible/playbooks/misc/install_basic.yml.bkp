@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: true
+  tasks:
+  - name: install tmux and netcat
+    action: >
+      yum name={{ item }} state=present update_cache=yes
+    with_items:
+      - nc
+      - tmux

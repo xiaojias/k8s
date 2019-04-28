@@ -1,0 +1,20 @@
+---
+- hosts: AUTOBUILD
+  environment:
+    http_proxy: http://100.72.69.4:8080 
+  gather_facts: false
+
+  tasks:
+  - name: Check connectivity to EITaaS UCD Server
+    #shell: nc -vz 10.173.122.50	 443
+    shell: curl -k -v -x 100.72.69.4:8080 10.173.122.50
+    register: curl_output
+    changed_when: false
+    ignore_errors: true
+
+  - name: Test connectivity with UCD Relay
+    shell: nc -vz 158.87.52.32 8443
+    register: netcat_output
+    changed_when: false
+    #ignore_errors: true
+
